@@ -29,3 +29,7 @@ postgres = {
  "POSTGRES_PASSWORD" : POSTGRES_PASSWORD ,
 } 
 agent.write_envfile("postgres.env", postgres) 
+ 
+valkey = { 
+} 
+agent.write_envfile("valkey.env", valkey) 
