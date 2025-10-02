@@ -33,3 +33,19 @@ agent.write_envfile("postgres.env", postgres)
 valkey = { 
 } 
 agent.write_envfile("valkey.env", valkey) 
+MINIO_BROWSER = data.get("MINIO_BROWSER", "on") 
+MINIO_DOMAIN = data.get("MINIO_DOMAIN", "minio") 
+MINIO_ADDRESS = data.get("MINIO_ADDRESS", ":9000") 
+MINIO_CONSOLE_ADDRESS = data.get("MINIO_CONSOLE_ADDRESS", ":9001") 
+MINIO_ROOT_USER = data.get("MINIO_ROOT_USER", "minioadmin") 
+MINIO_ROOT_PASSWORD = data.get("MINIO_ROOT_PASSWORD", "your_minio_password") 
+ 
+minio = { 
+ "MINIO_BROWSER" : MINIO_BROWSER ,
+ "MINIO_DOMAIN" : MINIO_DOMAIN ,
+ "MINIO_ADDRESS" : MINIO_ADDRESS ,
+ "MINIO_CONSOLE_ADDRESS" : MINIO_CONSOLE_ADDRESS ,
+ "MINIO_ROOT_USER" : MINIO_ROOT_USER ,
+ "MINIO_ROOT_PASSWORD" : MINIO_ROOT_PASSWORD ,
+} 
+agent.write_envfile("minio.env", minio) 
