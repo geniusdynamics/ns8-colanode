@@ -11,9 +11,9 @@ set -e
 # Prepare variables for later use
 images=()
 # The image will be pushed to GitHub container registry
-repobase="${REPOBASE:-ghcr.io/{{ GITHUB_OWNER }}}"
+repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
-reponame="{{ IMAGE_NAME }}"
+reponame="colanode"
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -45,7 +45,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images={{ IMAGES }}" \
+    --label="org.nethserver.images=docker.io/pgvector/pgvector:pg17 docker.io/valkey/valkey:8.1 docker.io/minio/minio:RELEASE.2025-04-08T15-41-24Z ghcr.io/colanode/server:latest ghcr.io/colanode/web:latest" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
