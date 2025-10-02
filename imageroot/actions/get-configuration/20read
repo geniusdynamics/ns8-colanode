@@ -24,3 +24,96 @@ config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
 
 # Dump the configuration to stdout
 # json.dump(config, fp=sys.stdout)
+if os.path.exists("web.env"): 
+	data = agent.read_envfile("web.env") 
+ 
+if os.path.exists("postgres.env"): 
+	data = agent.read_envfile("postgres.env") 
+	config["POSTGRES_USER"] = data.get("POSTGRES_USER", "colanode_user") 
+	config["POSTGRES_PASSWORD"] = data.get("POSTGRES_PASSWORD", "postgrespass123") 
+	config["POSTGRES_DB"] = data.get("POSTGRES_DB", "colanode_db") 
+else: 
+	config["POSTGRES_USER"] = "colanode_user" 
+	config["POSTGRES_PASSWORD"] = "postgrespass123" 
+	config["POSTGRES_DB"] = "colanode_db" 
+ 
+if os.path.exists("valkey.env"): 
+	data = agent.read_envfile("valkey.env") 
+ 
+if os.path.exists("minio.env"): 
+	data = agent.read_envfile("minio.env") 
+	config["MINIO_ROOT_PASSWORD"] = data.get("MINIO_ROOT_PASSWORD", "your_minio_password") 
+	config["MINIO_BROWSER"] = data.get("MINIO_BROWSER", "on") 
+	config["MINIO_DOMAIN"] = data.get("MINIO_DOMAIN", "minio") 
+	config["MINIO_ADDRESS"] = data.get("MINIO_ADDRESS", ":9000") 
+	config["MINIO_CONSOLE_ADDRESS"] = data.get("MINIO_CONSOLE_ADDRESS", ":9001") 
+	config["MINIO_ROOT_USER"] = data.get("MINIO_ROOT_USER", "minioadmin") 
+else: 
+	config["MINIO_ROOT_USER"] = "minioadmin" 
+	config["MINIO_ROOT_PASSWORD"] = "your_minio_password" 
+	config["MINIO_BROWSER"] = "on" 
+	config["MINIO_DOMAIN"] = "minio" 
+	config["MINIO_ADDRESS"] = ":9000" 
+	config["MINIO_CONSOLE_ADDRESS"] = ":9001" 
+ 
+if os.path.exists("server.env"): 
+	data = agent.read_envfile("server.env") 
+	config["REDIS_DB"] = data.get("REDIS_DB", "0") 
+	config["SMTP_HOST"] = data.get("SMTP_HOST", "your_smtp_provider_host") 
+	config["SMTP_EMAIL_FROM"] = data.get("SMTP_EMAIL_FROM", "your_email@example.com") 
+	config["ACCOUNT_VERIFICATION_TYPE"] = data.get("ACCOUNT_VERIFICATION_TYPE", "automatic") 
+	config["ACCOUNT_GOOGLE_ENABLED"] = data.get("ACCOUNT_GOOGLE_ENABLED", "true") 
+	config["USER_MAX_FILE_SIZE"] = data.get("USER_MAX_FILE_SIZE", "104857600") 
+	config["STORAGE_S3_REGION"] = data.get("STORAGE_S3_REGION", "us-east-1") 
+	config["STORAGE_S3_FORCE_PATH_STYLE"] = data.get("STORAGE_S3_FORCE_PATH_STYLE", "true") 
+	config["SMTP_PORT"] = data.get("SMTP_PORT", "587") 
+	config["SERVER_NAME"] = data.get("SERVER_NAME", "Colanode Local") 
+	config["SERVER_AVATAR"] = data.get("SERVER_AVATAR", "") 
+	config["SERVER_MODE"] = data.get("SERVER_MODE", "standalone") 
+	config["ACCOUNT_GOOGLE_CLIENT_ID"] = data.get("ACCOUNT_GOOGLE_CLIENT_ID", "your_google_client_id") 
+	config["POSTGRES_URL"] = data.get("POSTGRES_URL", "postgres://colanode_user:postgrespass123@postgres:5432/colanode_db") 
+	config["STORAGE_S3_ENDPOINT"] = data.get("STORAGE_S3_ENDPOINT", "http://minio:9000") 
+	config["STORAGE_S3_BUCKET"] = data.get("STORAGE_S3_BUCKET", "colanode") 
+	config["SMTP_USER"] = data.get("SMTP_USER", "your_smtp_username") 
+	config["NODE_ENV"] = data.get("NODE_ENV", "production") 
+	config["ACCOUNT_OTP_TIMEOUT"] = data.get("ACCOUNT_OTP_TIMEOUT", "600") 
+	config["ACCOUNT_GOOGLE_CLIENT_SECRET"] = data.get("ACCOUNT_GOOGLE_CLIENT_SECRET", "your_google_client_secret") 
+	config["STORAGE_S3_ACCESS_KEY"] = data.get("STORAGE_S3_ACCESS_KEY", "minioadmin") 
+	config["STORAGE_S3_SECRET_KEY"] = data.get("STORAGE_S3_SECRET_KEY", "your_minio_password") 
+	config["SMTP_ENABLED"] = data.get("SMTP_ENABLED", "false") 
+	config["SMTP_PASSWORD"] = data.get("SMTP_PASSWORD", "your_smtp_password") 
+	config["SMTP_EMAIL_FROM_NAME"] = data.get("SMTP_EMAIL_FROM_NAME", "Colanode") 
+	config["LOGGING_LEVEL"] = data.get("LOGGING_LEVEL", "debug") 
+	config["USER_STORAGE_LIMIT"] = data.get("USER_STORAGE_LIMIT", "10737418240") 
+	config["REDIS_URL"] = data.get("REDIS_URL", "redis://:your_valkey_password@valkey:6379/0") 
+else: 
+	config["SERVER_MODE"] = "standalone" 
+	config["ACCOUNT_GOOGLE_CLIENT_ID"] = "your_google_client_id" 
+	config["POSTGRES_URL"] = "postgres://colanode_user:postgrespass123@postgres:5432/colanode_db" 
+	config["STORAGE_S3_ENDPOINT"] = "http://minio:9000" 
+	config["STORAGE_S3_BUCKET"] = "colanode" 
+	config["SMTP_USER"] = "your_smtp_username" 
+	config["NODE_ENV"] = "production" 
+	config["ACCOUNT_OTP_TIMEOUT"] = "600" 
+	config["ACCOUNT_GOOGLE_CLIENT_SECRET"] = "your_google_client_secret" 
+	config["STORAGE_S3_ACCESS_KEY"] = "minioadmin" 
+	config["STORAGE_S3_SECRET_KEY"] = "your_minio_password" 
+	config["SMTP_ENABLED"] = "false" 
+	config["SMTP_PASSWORD"] = "your_smtp_password" 
+	config["SMTP_EMAIL_FROM_NAME"] = "Colanode" 
+	config["LOGGING_LEVEL"] = "debug" 
+	config["USER_STORAGE_LIMIT"] = "10737418240" 
+	config["REDIS_URL"] = "redis://:your_valkey_password@valkey:6379/0" 
+	config["REDIS_DB"] = "0" 
+	config["SMTP_HOST"] = "your_smtp_provider_host" 
+	config["SMTP_EMAIL_FROM"] = "your_email@example.com" 
+	config["ACCOUNT_VERIFICATION_TYPE"] = "automatic" 
+	config["ACCOUNT_GOOGLE_ENABLED"] = "true" 
+	config["USER_MAX_FILE_SIZE"] = "104857600" 
+	config["STORAGE_S3_REGION"] = "us-east-1" 
+	config["STORAGE_S3_FORCE_PATH_STYLE"] = "true" 
+	config["SMTP_PORT"] = "587" 
+	config["SERVER_NAME"] = "Colanode Local" 
+	config["SERVER_AVATAR"] = "" 
+ 
+json.dump(config, fp=sys.stdout)
