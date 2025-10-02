@@ -19,3 +19,13 @@ data = json.load(sys.stdin)
 web = { 
 } 
 agent.write_envfile("web.env", web) 
+POSTGRES_DB = data.get("POSTGRES_DB", "colanode_db") 
+POSTGRES_USER = data.get("POSTGRES_USER", "colanode_user") 
+POSTGRES_PASSWORD = data.get("POSTGRES_PASSWORD", "postgrespass123") 
+ 
+postgres = { 
+ "POSTGRES_DB" : POSTGRES_DB ,
+ "POSTGRES_USER" : POSTGRES_USER ,
+ "POSTGRES_PASSWORD" : POSTGRES_PASSWORD ,
+} 
+agent.write_envfile("postgres.env", postgres) 
