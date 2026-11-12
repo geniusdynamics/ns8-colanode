@@ -14,6 +14,9 @@ images=()
 repobase="${REPOBASE:-ghcr.io/geniusdynamics}"
 # Configure the image name
 reponame="colanode"
+# Node.js 25+ no longer ships Corepack, install it from npm
+# renovate: datasource=npm packageName=corepack
+corepack_version=0.36.0
 
 # Create a new empty container image
 container=$(buildah from scratch)
@@ -21,7 +24,8 @@ container=$(buildah from scratch)
 # Reuse existing nodebuilder-colanode container, to speed up builds
 if ! buildah containers --format "{{.ContainerName}}" | grep -q nodebuilder-colanode; then
     echo "Pulling NodeJS runtime..."
-    buildah from --name nodebuilder-colanode -v "${PWD}:/usr/src:Z" docker.io/library/node:lts
+    buildah from --name nodebuilder-colanode -v "${PWD}:/usr/src:Z" docker.io/library/node:26.13.0-slim
+    buildah run nodebuilder-colanode sh -c "npm install -g corepack@${corepack_version} && corepack enable"
 fi
 
 echo "Build static UI files with node..."
@@ -35,17 +39,18 @@ buildah run \
 buildah add "${container}" imageroot /imageroot
 buildah add "${container}" ui/dist /ui
 # Setup the entrypoint, ask to reserve one TCP port with the label and set a rootless container
-# Select you image(s) with the label org.nethserver.images
-# ghcr.io/xxxxx is the GitHub container registry or your own registry or docker.io for Docker Hub
-# The image tag is set to latest by default, but can be overridden with the IMAGETAG environment variable
-# --label="org.nethserver.images=docker.io/mariadb:10.11.5 docker.io/roundcube/roundcubemail:1.6.4-apache"
-# rootfull=0 === rootless container
-# tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
+# The third-party images run inside the pod and are pulled at install time:
+#   - pgvector/pgvector: PostgreSQL 17 with the pgvector extension
+#   - valkey/valkey: Redis-compatible queue and event bus
+#   - colanode/server: API server
+#   - colanode/web: static web client, served by nginx
+# Every tag is fully pinned, so that Renovate can track upstream releases.
 buildah config --entrypoint=/ \
     --label="org.nethserver.authorizations=traefik@node:routeadm" \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
-    --label="org.nethserver.images=docker.io/pgvector/pgvector:pg17 docker.io/valkey/valkey:8.1 docker.io/minio/minio:RELEASE.2025-04-08T15-41-24Z ghcr.io/colanode/server:latest ghcr.io/colanode/web:latest" \
+    --label="org.nethserver.min-core=3.12.4-0" \
+    --label="org.nethserver.images=docker.io/pgvector/pgvector:0.8.7-pg17 docker.io/valkey/valkey:8.1.11 ghcr.io/colanode/server:0.4.7 ghcr.io/colanode/web:0.4.7" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
