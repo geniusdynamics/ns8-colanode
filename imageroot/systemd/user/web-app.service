@@ -1,28 +1,30 @@
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 [Unit]
-Description=Podman  web-app.service
+Description=Podman web-app.service
 BindsTo=colanode.service
 After=colanode.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-EnvironmentFile=-%S/state/smarthost.env
-WorkingDirectory=%S/state
+EnvironmentFile=%E/state/environment
+WorkingDirectory=%E/state
 Restart=always
 TimeoutStopSec=70
-ExecStartPre=/bin/mkdir -p tmp
 ExecStartPre=/bin/rm -f %t/web-app.pid %t/web-app.ctr-id
-ExecStartPre=-runagent discover-smarthost
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/web-app.pid  --cidfile %t/web-app.ctr-id --cgroups=no-conmon  --pod-id-file %t/colanode.pod-id --replace -d --name  web-app     --env-file web.env  ${WEB_IMAGE}  
+# nginx serves the web client on port 80 and forwards /config and
+# /client/ to the server container, which shares the pod network.
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/web-app.pid \
+    --cidfile %t/web-app.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/colanode.pod-id --replace -d --name web-app \
+    --volume %E/etc/web-nginx.conf:/etc/nginx/conf.d/default.conf:ro,z \
+    ${WEB_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/web-app.ctr-id -t 10
-ExecReload=/usr/bin/podman kill -s HUP web-app
-SyslogIdentifier=%u
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/web-app.ctr-id
+SyslogIdentifier=%u
 PIDFile=%t/web-app.pid
 Type=forking
 

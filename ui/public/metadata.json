@@ -1,19 +1,22 @@
 {
   "name": "colanode",
   "description": {
-    "en": "My colanode module"
+    "en": "Self-hosted team workspace for chat, documents and tasks, running on your own server with its web app.",
+    "it": "Spazio di lavoro per la squadra con chat, documenti e attività, ospitato sul proprio server con la sua app web."
   },
-  "categories": [],
+  "categories": [
+    "collaboration"
+  ],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Genius Dynamics",
+      "email": "support@genius.ke"
     }
   ],
   "docs": {
-    "documentation_url": "https://docs.colanode.com/",
-    "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-colanode"
+    "documentation_url": "https://github.com/colanode/colanode",
+    "bug_url": "https://github.com/geniusdynamics/ns8-colanode/issues",
+    "code_url": "https://github.com/geniusdynamics/ns8-colanode"
   },
-  "source": "ghcr.io/nethserver/colanode"
+  "source": "ghcr.io/geniusdynamics/colanode"
 }
