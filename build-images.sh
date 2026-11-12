@@ -50,7 +50,7 @@ buildah config --entrypoint=/ \
     --label="org.nethserver.tcp-ports-demand=1" \
     --label="org.nethserver.rootfull=0" \
     --label="org.nethserver.min-core=3.12.4-0" \
-    --label="org.nethserver.images=docker.io/pgvector/pgvector:0.8.7-pg17 docker.io/valkey/valkey:8.1.11 ghcr.io/colanode/server:0.4.7 ghcr.io/colanode/web:0.4.7" \
+    --label="org.nethserver.images=docker.io/pgvector/pgvector:0.8.7-pg17 docker.io/valkey/valkey:9.2 ghcr.io/colanode/server:0.4.7 ghcr.io/colanode/web:0.4.7" \
     "${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"
