@@ -2,7 +2,7 @@
   "name": "colanode",
   "description": {
     "en": "Self-hosted team workspace for chat, documents and tasks, running on your own server with its web app.",
-    "it": "Spazio di lavoro per la squadra con chat, documenti e attività, ospitato sul proprio server con la sua app web."
+    "it": "Colanode è uno spazio di lavoro collaborativo local-first con chat, documenti e database."
   },
   "categories": [
     "collaboration"
