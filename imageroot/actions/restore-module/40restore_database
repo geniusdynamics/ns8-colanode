@@ -1,41 +1,29 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2022 Nethesis S.r.l.
+# Copyright (C) 2026 Genius Dynamics
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
 set -e -o pipefail
-# exec 1>&2 # Redirect any output to the journal (stderr)
-#
-# # Prepare an initialization script that restores the dump file
-# mkdir -vp initdb.d
-# mv -v colanode.sql initdb.d
-# #do the bash file to restore and exit once done
-# cat - >initdb.d/zz_colanode_restore.sh <<'EOS'
-# # Print additional information:
-# mysql --version
-# # The script is sourced, override entrypoint args and exit:
-# set -- true
-# docker_temp_server_stop
-# exit 0
-# EOS
-#
-# # once we exit we remove initdb.d
-# trap 'rm -rfv initdb.d/' EXIT
+exec 1>&2
 
-# we start a container to initiate a database and load the dump
-# at the end of colanode_restore.sh the dump is loaded and
-# we exit the container
-# podman run \
-#   --rm \
-#   --interactive \
-#   --network=none \
-#   --volume=./initdb.d:/docker-entrypoint-initdb.d:z \
-#   --volume mysql-data:/var/lib/mysql/:Z \
-#   --env MARIADB_ROOT_PASSWORD=Nethesis,1234 \
-#   --env MARIADB_DATABASE=colanode \
-#   --env MARIADB_USER=colanode \
-#   --env MARIADB_PASSWORD=colanode \
-#   --replace --name=restore_db \
-#   ${MARIADB_IMAGE}
+# The backup holds passwords.env, so the restored database keeps the
+# credentials the server uses. Load the dump into a fresh database with a
+# throwaway PostgreSQL container.
+# shellcheck disable=SC1091
+source passwords.env
+podman run --rm --detach --network=none --name=restore_db \
+    --volume postgres-data:/var/lib/postgresql/data:Z \
+    --env=POSTGRES_USER=colanode \
+    --env=POSTGRES_DB=colanode \
+    --env=POSTGRES_PASSWORD="${POSTGRES_PASSWORD}" \
+    "${PGVECTOR_IMAGE}"
+trap 'podman rm -f restore_db >/dev/null 2>&1 || true' EXIT
+for _ in $(seq 1 60); do
+    podman exec restore_db pg_isready -U colanode -d colanode >/dev/null 2>&1 && break
+    sleep 2
+done
+podman exec --interactive restore_db pg_restore -U colanode -d colanode --clean --if-exists --no-owner < colanode.dump
+podman stop restore_db
+rm -f colanode.dump
